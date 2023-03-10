@@ -4,10 +4,14 @@ import './App.css'
 import {SearchForm} from "./components/SearchForm/SearchForm";
 import { RepoItemList } from './components/RepoItemList/RepoItemList';
 import { GITHUB_CLIENT_ID } from './config';
+import {useDispatch} from "react-redux";
+import {setAccessToken} from "./actions/setAccessToken";
 
 function App() {
   const [rerender, setRerender] = useState(false);
-  const [token, setToken] = useState<string>('')
+  const [token, setToken] = useState<string>('');
+
+    const dispatch = useDispatch();
 
     function loginWithGithub() {
         window.location.assign("https://github.com/login/oauth/authorize?client_id=" + GITHUB_CLIENT_ID)
@@ -104,6 +108,8 @@ function App() {
                         console.log(data)
                         if (data.access_token) {
                             localStorage.setItem('accessToken', data.access_token);
+                            console.log('predisp')
+                            dispatch(setAccessToken(token));
                             setRerender(!rerender);
                         }
                     })
@@ -113,37 +119,37 @@ function App() {
     }, [])
 
   return (
-    <div className="app">
-        <button onClick={loginWithGithub}>
-            LOGIN
-        </button>
-        <button onClick={getUserData}>
-            GET USER DATA
-        </button>
-        <button onClick={() => searchRepositories('react')}>
-            GET REPO DATA
-        </button>
+          <div className="app">
+              <button onClick={loginWithGithub}>
+                  LOGIN
+              </button>
+              <button onClick={getUserData}>
+                  GET USER DATA
+              </button>
+              <button onClick={() => searchRepositories('react')}>
+                  GET REPO DATA
+              </button>
 
-        <SearchForm />
-        <RepoItemList />
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+              <SearchForm />
+              <RepoItemList />
+              <div>
+                  <a href="https://vitejs.dev" target="_blank">
+                      <img src="/vite.svg" className="logo" alt="Vite logo" />
+                  </a>
+                  <a href="https://reactjs.org" target="_blank">
+                      <img src={reactLogo} className="logo react" alt="React logo" />
+                  </a>
+              </div>
+              <h1>Vite + React</h1>
+              <div className="card">
+                  <p>
+                      Edit <code>src/App.tsx</code> and save to test HMR
+                  </p>
+              </div>
+              <p className="read-the-docs">
+                  Click on the Vite and React logos to learn more
+              </p>
+          </div>
   )
 }
 

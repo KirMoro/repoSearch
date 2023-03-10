@@ -1,1 +1,2 @@
 export const GITHUB_CLIENT_ID = '8d970ed03ae6f5d51356';
+export const SET_ACCESS_TOKEN = 'SET_ACCESS_TOKEN';

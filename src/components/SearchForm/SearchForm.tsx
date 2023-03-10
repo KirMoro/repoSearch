@@ -1,20 +1,12 @@
 import './SearchForm.css';
-import {useEffect, useState} from "react";
-import { useQuery } from '@apollo/client';
-import {SearchRepositoriesData, SearchRepositoriesVariables, SEARCH_REPOSITORIES, searchRepositories} from "../../query"
+import {useState} from "react";
 
 export const SearchForm = ({onSearch}) => {
 
-    // const repositories = searchRepositories('react');
-    // console.log(repositories);
-
-
-    const [form, setForm] = useState({
-        request: "",
-    });
+    const [form, setForm] = useState('');
 
     const handleChange = e => {
-        const { name, value } = e.target;
+        const { value } = e.target;
         const nextFormState = {
             ...form,
             [name]: value,
@@ -30,19 +22,6 @@ export const SearchForm = ({onSearch}) => {
         }
         onSearch(searchData);
     }
-
-    // useEffect(() => {
-    //     if (location.pathname === '/movies') {
-    //         const searchRequest = JSON.parse(localStorage.getItem('searchRequest'));
-    //
-    //         // if (searchRequest) {
-    //         //     setSwitchState(searchRequest.switch);
-    //         //     setForm({
-    //         //         request: searchRequest.request,
-    //         //     });
-    //         // }
-    //     }
-    // }, []);
 
     return (
         <article className="search">
