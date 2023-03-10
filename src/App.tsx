@@ -6,6 +6,8 @@ import { RepoItemList } from './components/RepoItemList/RepoItemList';
 import { GITHUB_CLIENT_ID } from './config';
 import {useDispatch} from "react-redux";
 import {setAccessToken} from "./actions/setAccessToken";
+import {GraphQlResponse, Repository, SearchRepositoriesData} from "./types";
+import {searchRepositoriesSuccess} from "./actions/setSearchRepositories";
 
 function App() {
   const [rerender, setRerender] = useState(false);
@@ -25,33 +27,6 @@ function App() {
           .then((data) => {
               console.log(data)
           })
-    }
-
-    interface Repository {
-        name: string;
-        description: string;
-        url: string;
-        stargazers: {
-            totalCount: number;
-        };
-        primaryLanguage: {
-            name: string;
-        };
-    }
-
-    interface SearchRepositoriesData {
-        search: {
-            nodes: Repository[];
-        };
-    }
-
-    interface GraphQlResponse<T> {
-        data?: T;
-        errors?: GraphQLError[];
-    }
-
-    interface GraphQLError {
-        message: string;
     }
 
     async function searchRepositories(query: string): Promise<Repository[]> {
@@ -89,6 +64,14 @@ function App() {
         const repositories = result.data.search.nodes;
 
         return repositories ?? [];
+    }
+
+    async function handleSearch(searchData) {
+       const searchResult = await searchRepositories(searchData.request);
+
+        dispatch(searchRepositoriesSuccess(searchResult));
+
+        return searchResult;
     }
 
     useEffect(() => {
@@ -130,7 +113,9 @@ function App() {
                   GET REPO DATA
               </button>
 
-              <SearchForm />
+              <SearchForm
+              onSearch={handleSearch}
+              />
               <RepoItemList />
               <div>
                   <a href="https://vitejs.dev" target="_blank">

@@ -1,10 +1,13 @@
 import './RepoItemList.css';
 import {RepoCard} from "../RepoCard/RepoCard";
-import {repoData} from "../../__fixtures__/repoData.js";
+import {useSelector} from "react-redux";
 
 export const RepoItemList = ({movies, onSave, searchError, searchSaveError }) => {
 
-    const repositoriesData = repoData.data.search.nodes;
+    const repositoriesData = useSelector((state) => state.search.items);
+
+
+
 
     // const [index, setIndex] = useState({
     //     start: constants.INITIAL_MOVIES_CARDS_L,
@@ -39,16 +42,6 @@ export const RepoItemList = ({movies, onSave, searchError, searchSaveError }) =>
     //
     // const renderMovies = movies.slice(0, index.start);
 
-    const handleHasMore = () => {
-        setIndex({
-            start: index.start + index.load,
-            load: index.load,
-        })
-
-        if (renderMovies.length >= movies.length - index.load) {
-            setLoadMore(false)
-        }
-    }
 
     // useEffect(() => {
     //     if (movies.length <= index.load) {

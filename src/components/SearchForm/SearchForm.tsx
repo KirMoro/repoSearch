@@ -1,12 +1,17 @@
-import './SearchForm.css';
-import {useState} from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
+import "./SearchForm.css";
 
-export const SearchForm = ({onSearch}) => {
+interface SearchFormProps {
+    onSearch: (searchData: { request: string }) => void;
+}
 
-    const [form, setForm] = useState('');
+export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+    const [form, setForm] = useState<{ request: string }>({ request: "" });
 
-    const handleChange = e => {
-        const { value } = e.target;
+    const handleChange = (
+        e: ChangeEvent<HTMLInputElement>
+    ): void => {
+        const { name, value } = e.target;
         const nextFormState = {
             ...form,
             [name]: value,
@@ -15,37 +20,35 @@ export const SearchForm = ({onSearch}) => {
         setForm(nextFormState);
     };
 
-    const handleSubmit = e => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault();
         const searchData = {
             request: form.request,
-        }
+        };
         onSearch(searchData);
-    }
+    };
 
     return (
         <article className="search">
-            <form
-                onSubmit={handleSubmit}
-                className="search__form">
+            <form onSubmit={handleSubmit} className="search__form">
                 <fieldset className="search__form-fieldset search__form-fieldset_type_input">
                     <label>
                         <input
                             required
                             name="request"
                             placeholder="Название репозитория"
-                            value={form.request || ''}
+                            value={form.request}
                             onChange={handleChange}
-                            className="search__form-input"/>
-                        <button className="search__form-button"
-                                type="submit"
-                                aria-label="Поиск"
+                            className="search__form-input"
+                        />
+                        <button
+                            className="search__form-button"
+                            type="submit"
+                            aria-label="Поиск"
                         ></button>
                     </label>
-
                 </fieldset>
             </form>
         </article>
     );
 };
-
