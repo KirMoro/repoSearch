@@ -1,15 +1,129 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import reactLogo from './assets/react.svg'
-
 import './App.css'
 import {SearchForm} from "./components/SearchForm/SearchForm";
 import { RepoItemList } from './components/RepoItemList/RepoItemList';
+import { GITHUB_CLIENT_ID } from './config';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [rerender, setRerender] = useState(false);
+  const [token, setToken] = useState<string>('')
+
+    function loginWithGithub() {
+        window.location.assign("https://github.com/login/oauth/authorize?client_id=" + GITHUB_CLIENT_ID)
+    }
+
+    async function getUserData() {
+      await fetch("http://localhost:4000/userData?accessToken=" + localStorage.getItem("accessToken"))
+          .then((res) => {
+              return res.json();
+          })
+          .then((data) => {
+              console.log(data)
+          })
+    }
+
+    interface Repository {
+        name: string;
+        description: string;
+        url: string;
+        stargazers: {
+            totalCount: number;
+        };
+        primaryLanguage: {
+            name: string;
+        };
+    }
+
+    interface SearchRepositoriesData {
+        search: {
+            nodes: Repository[];
+        };
+    }
+
+    interface GraphQlResponse<T> {
+        data?: T;
+        errors?: GraphQLError[];
+    }
+
+    interface GraphQLError {
+        message: string;
+    }
+
+    async function searchRepositories(query: string): Promise<Repository[]> {
+        const response = await fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ` + localStorage.getItem("accessToken"),
+            },
+            body: JSON.stringify({
+                query: `
+        query SearchRepositories($query: String!) {
+          search(query: $query, type: REPOSITORY, first: 10) {
+            nodes {
+              ... on Repository {
+                name
+                description
+                url
+                stargazers {
+                  totalCount
+                }
+                primaryLanguage {
+                  name
+                }
+              }
+            }
+          }
+        }
+      `,
+                variables: { query },
+            }),
+        });
+
+        const result: GraphQlResponse<SearchRepositoriesData> = await response.json();
+        const repositories = result.data.search.nodes;
+
+        return repositories ?? [];
+    }
+
+    useEffect(() => {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const codeParams = urlParams.get('code');
+
+        if (codeParams && (localStorage.getItem("accessToken")) === null) {
+            async function getAccessToken() {
+                await fetch("http://localhost:4000/accessToken?code=" + codeParams, {
+                    method: "GET"
+                })
+                    .then((res) => {
+                        return res.json();
+                    })
+                    .then((data) => {
+                        console.log(data)
+                        if (data.access_token) {
+                            localStorage.setItem('accessToken', data.access_token);
+                            setRerender(!rerender);
+                        }
+                    })
+            }
+            getAccessToken();
+        }
+    }, [])
 
   return (
     <div className="app">
+        <button onClick={loginWithGithub}>
+            LOGIN
+        </button>
+        <button onClick={getUserData}>
+            GET USER DATA
+        </button>
+        <button onClick={() => searchRepositories('react')}>
+            GET REPO DATA
+        </button>
+
         <SearchForm />
         <RepoItemList />
       <div>
@@ -22,9 +136,6 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

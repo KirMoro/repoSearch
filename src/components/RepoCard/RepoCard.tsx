@@ -22,7 +22,6 @@ export const RepoCard = ({repository, onSave
                 <p className="repocard__text">{repository.url}</p>
                 <span className="repocard__label">Последнее обновление</span>
                 <p className="repocard__time">{repository.updatedAt}</p>
-
             </div>
         </li>
     );

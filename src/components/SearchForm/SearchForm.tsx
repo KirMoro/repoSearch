@@ -1,7 +1,13 @@
 import './SearchForm.css';
 import {useEffect, useState} from "react";
+import { useQuery } from '@apollo/client';
+import {SearchRepositoriesData, SearchRepositoriesVariables, SEARCH_REPOSITORIES, searchRepositories} from "../../query"
 
 export const SearchForm = ({onSearch}) => {
+
+    // const repositories = searchRepositories('react');
+    // console.log(repositories);
+
 
     const [form, setForm] = useState({
         request: "",
