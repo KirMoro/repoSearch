@@ -1,14 +1,14 @@
 import {GraphQlResponse, Repository, SearchRepositoriesData} from "../types";
 
 export async function searchRepositories(query: string): Promise<Repository[]> {
-    const response = await fetch('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ` + localStorage.getItem("accessToken"),
-        },
-        body: JSON.stringify({
-            query: `
+  const response = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ` + localStorage.getItem("accessToken"),
+    },
+    body: JSON.stringify({
+      query: `
         query SearchRepositories($query: String!) {
           search(query: $query, type: REPOSITORY, first: 100) {
             nodes {
@@ -35,25 +35,25 @@ export async function searchRepositories(query: string): Promise<Repository[]> {
           }
         }
       `,
-            variables: { query },
-        }),
-    });
+      variables: {query},
+    }),
+  });
 
-    const result: GraphQlResponse<SearchRepositoriesData> = await response.json();
-    const repositories = result.data.search.nodes;
+  const result: GraphQlResponse<SearchRepositoriesData> = await response.json();
+  const repositories = result.data.search.nodes;
 
-    return repositories ?? [];
+  return repositories ?? [];
 }
 
 export async function getUserRepositories(login: string): Promise<any> {
-    const response = await fetch('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ` + localStorage.getItem("accessToken"),
-        },
-        body: JSON.stringify({
-            query: `
+  const response = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ` + localStorage.getItem("accessToken"),
+    },
+    body: JSON.stringify({
+      query: `
         query UserRepositories($login: String!) {
   user(login: $login) {
     repositories(first: 100) {
@@ -70,13 +70,13 @@ export async function getUserRepositories(login: string): Promise<any> {
   }
 }
       `,
-            variables: {
-                login
-            }
-        })
-    });
+      variables: {
+        login
+      }
+    })
+  });
 
-    const data = await response.json();
+  const data = await response.json();
 
-    return data;
+  return data;
 }
