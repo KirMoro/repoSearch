@@ -1,4 +1,4 @@
-import {SEARCH_USER_INFO, SEARCH_USER_REPOSITORIES} from "../config";
+import {SEARCH_USER_REPOSITORIES} from "../config";
 import {Repository} from "../types";
 import {searchUserRepositories} from "../actions/setSearchUserRepositories";
 
@@ -17,12 +17,6 @@ const initialState: SearchUserRepositoriesState = {
 export const searchUserRepositoriesReducer = (state = initialState, action: searchUserRepositories): SearchUserRepositoriesState => {
     switch (action.type) {
         case SEARCH_USER_REPOSITORIES:
-            return {
-                ...state,
-                loading: false,
-                items: action.payload.items,
-            };
-        case SEARCH_USER_INFO:
             return {
                 ...state,
                 loading: false,

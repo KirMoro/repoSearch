@@ -26,24 +26,6 @@ export interface Repository {
     };
 }
 
-export interface UserRepository {
-    id: string;
-    name: string;
-    stargazerCount: number;
-    pushedAt: string;
-    owner: {
-        avatarUrl?: string;
-        login: string;
-        url: string;
-    };
-    languages: {
-        nodes: {
-            name: string;
-        }[];
-    };
-    description: string;
-}
-
 export interface User {
     id: string;
     login: string;

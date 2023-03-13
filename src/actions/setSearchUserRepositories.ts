@@ -10,7 +10,8 @@ interface SearchUserRepositoriesAction {
 
 export type SearchUserRepositoriesType = SearchUserRepositoriesAction;
 
-export const searchUserRepositories = (items: Repository[]): SearchUserRepositoriesAction => ({
+export const searchUserRepositories = (items: Repository[]): SearchUserRepositoriesAction => (
+  {
     type: SEARCH_USER_REPOSITORIES,
     payload: { items },
 });

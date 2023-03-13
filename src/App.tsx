@@ -11,6 +11,7 @@ import {searchUserData} from "./actions/setUserDataAction";
 import {Route, Routes} from "react-router-dom";
 import {RepositoryDetails} from "./components/RepositoryDetails/RepositoryDetails";
 import {getUserRepositories, searchRepositories} from "./utils/graphql";
+import {searchUserRepositories} from "./actions/setSearchUserRepositories";
 
 function App() {
   const [rerender, setRerender] = useState(false);
@@ -97,6 +98,7 @@ function App() {
       getUserRepositories(userLogin)
         .then(data => {
           dispatch(searchRepositoriesSuccess(data.data.user.repositories.nodes));
+          dispatch(searchUserRepositories(data.data.user.repositories.nodes));
         })
     }
 

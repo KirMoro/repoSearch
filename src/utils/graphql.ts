@@ -58,17 +58,27 @@ export async function getUserRepositories(login: string): Promise<any> {
   user(login: $login) {
     repositories(first: 100) {
       nodes {
-        name
-        id
-        description
-        createdAt
-        updatedAt
-        stargazerCount
-        forkCount
+         name
+                id
+                description
+                url
+                stargazerCount
+                updatedAt
+                owner {
+        avatarUrl
+        login
+        url
       }
-    }
-  }
-}
+       languages(first: 10) {
+        nodes {
+          name
+        }
+      }
+      description
+              }
+            }
+          }
+        }
       `,
       variables: {
         login
