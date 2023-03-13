@@ -15,7 +15,6 @@ export const authReducer = (
 ): AuthState => {
     switch (action.type) {
         case SET_ACCESS_TOKEN:
-            console.log(action.payload)
             return {
                 ...state,
                 accessToken: action.payload,

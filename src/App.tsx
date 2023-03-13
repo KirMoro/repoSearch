@@ -34,13 +34,18 @@ function App() {
     window.location.assign("https://github.com/login/oauth/authorize?client_id=" + GITHUB_CLIENT_ID)
   }
 
-  async function getUserData() {
-    await fetch("http://localhost:4000/userData?accessToken=" + localStorage.getItem("accessToken"))
+  async function getUserData(token) {
+    await fetch("http://localhost:4000/userData?accessToken=" + token)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
         localStorage.setItem('userLogin', data.login);
+        getUserRepositories(data.login)
+          .then(data => {
+            dispatch(searchRepositoriesSuccess(data.data.user.repositories.nodes));
+            dispatch(searchUserRepositories(data.data.user.repositories.nodes));
+          })
         dispatch(searchUserData(data));
       })
   }
@@ -74,6 +79,7 @@ function App() {
             if (data.access_token) {
               localStorage.setItem('accessToken', data.access_token);
               dispatch(setAccessToken(data.access_token));
+              getUserData(data.access_token);
               setRerender(!rerender);
             }
           })
@@ -82,26 +88,14 @@ function App() {
       getAccessToken();
     }
 
-    getUserData();
+    const token = localStorage.getItem('accessToken');
+    getUserData(token);
 
     const saveRepositories = JSON.parse(localStorage.getItem('searchResult'));
 
     if (saveRepositories) {
       dispatch(searchRepositoriesSuccess(saveRepositories));
-
-      const previousPage = localStorage.getItem('currentPage');
-      if (previousPage) {
-        setCurrentPage(previousPage)
-      }
-    } else {
-      const userLogin = localStorage.getItem('userLogin');
-      getUserRepositories(userLogin)
-        .then(data => {
-          dispatch(searchRepositoriesSuccess(data.data.user.repositories.nodes));
-          dispatch(searchUserRepositories(data.data.user.repositories.nodes));
-        })
     }
-
   }, [])
 
   return (
