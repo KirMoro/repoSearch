@@ -37,13 +37,13 @@ Frontend приложение, которое состоит из двух ст�
 ```
 Клонировать репозиторий
 
-git clone ,,,
+git clone https://github.com/KirMoro/repoSearch.git
 
 Запустить сервер в папке backend
 npm install
-npm start
+npm dev or start
 
 Запустить приложение
 npm install
-npm start
+npm dev or build
 ```
