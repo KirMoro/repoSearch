@@ -7,17 +7,51 @@ interface SetAccessTokenAction {
 
 export type AuthActionTypes = SetAccessTokenAction;
 
-
 export interface Repository {
     name: string;
+    id: string;
     description: string;
     url: string;
-    stargazers: {
-        totalCount: number;
+    stargazerCount: number;
+    updatedAt: string;
+    owner: {
+        avatarUrl: string;
+        login: string;
+        url: string;
     };
-    primaryLanguage: {
-        name: string;
+    languages: {
+        nodes: {
+            name: string;
+        }[];
     };
+}
+
+export interface UserRepository {
+    id: string;
+    name: string;
+    stargazerCount: number;
+    pushedAt: string;
+    owner: {
+        avatarUrl?: string;
+        login: string;
+        url: string;
+    };
+    languages: {
+        nodes: {
+            name: string;
+        }[];
+    };
+    description: string;
+}
+
+export interface User {
+    id: string;
+    login: string;
+    name: string;
+    email: string;
+    avatar_url: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface SearchRepositoriesData {

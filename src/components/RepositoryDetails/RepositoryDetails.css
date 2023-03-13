@@ -1,0 +1,58 @@
+.repositoryDetails {
+    font-size: 18px;
+    line-height: 1rem;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.repositoryDetails__header {
+    display: flex;
+    margin: 20px 0 30px 0;
+}
+
+.repositoryDetails__main {
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+}
+
+.repositoryDetails__description {
+    display: flex;
+    flex-direction: column;
+    width: 450px;
+    align-items: flex-start;
+}
+
+.repositoryDetails__user {
+    display: flex;
+    flex-direction: column;
+}
+
+.repositoryDetails__title {
+    margin: 0;
+    padding: 0 30px 0 0;
+}
+
+.repositoryDetails__subtitle {
+    font-size: 20px;
+    margin: 15px 0 15px 0;
+    padding: 0;
+}
+
+.repositoryDetails__text {
+    margin: 0;
+    padding: 0 20px 0 0;
+}
+
+.repositoryDetails__image {
+    width: 100px;
+    margin: 15px 0 15px 0;
+    padding: 0;
+}
+
+.repositoryDetails__list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 20px;
+}

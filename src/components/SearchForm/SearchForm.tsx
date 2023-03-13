@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, {useState, ChangeEvent, FormEvent, useEffect} from "react";
 import "./SearchForm.css";
 
 interface SearchFormProps {
@@ -27,6 +27,17 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
         };
         onSearch(searchData);
     };
+
+    useEffect(() => {
+        const searchRequestData = localStorage.getItem('searchRequest');
+
+        if (searchRequestData) {
+                setForm({
+                    request: searchRequestData,
+                });
+            }
+
+    }, []);
 
     return (
         <article className="search">

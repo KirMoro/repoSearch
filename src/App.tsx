@@ -1,17 +1,31 @@
 import {useEffect, useState} from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
 import {SearchForm} from "./components/SearchForm/SearchForm";
 import { RepoItemList } from './components/RepoItemList/RepoItemList';
 import { GITHUB_CLIENT_ID } from './config';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setAccessToken} from "./actions/setAccessToken";
-import {GraphQlResponse, Repository, SearchRepositoriesData} from "./types";
-import {searchRepositoriesSuccess} from "./actions/setSearchRepositories";
+import {searchRepositoriesRequest, searchRepositoriesSuccess} from "./actions/setSearchRepositories";
+import {Pagination} from "./components/Pagination/Pagination";
+import {searchUserData} from "./actions/setUserDataAction";
+import {Route, Routes} from "react-router-dom";
+import {RepositoryDetails} from "./components/RepositoryDetails/RepositoryDetails";
+import {getUserRepositories, searchRepositories} from "./utils/graphql";
 
 function App() {
   const [rerender, setRerender] = useState(false);
-  const [token, setToken] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [repositoriesPerPage] = useState<number>(10);
+
+  const repositories = useSelector(state => state.search.items);
+
+  const lastRepositoriesIndex = currentPage * repositoriesPerPage;
+  const firstRepositoryIndex = lastRepositoriesIndex - repositoriesPerPage;
+  const currentRepositories = repositories.slice(firstRepositoryIndex, lastRepositoriesIndex);
+  const setPaginate = (pageNumber) => {
+      setCurrentPage(pageNumber);
+      localStorage.setItem('currentPage', pageNumber);
+  }
 
     const dispatch = useDispatch();
 
@@ -25,50 +39,18 @@ function App() {
               return res.json();
           })
           .then((data) => {
-              console.log(data)
+              localStorage.setItem('userLogin', data.login);
+              dispatch(searchUserData(data));
           })
-    }
-
-    async function searchRepositories(query: string): Promise<Repository[]> {
-        const response = await fetch('https://api.github.com/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ` + localStorage.getItem("accessToken"),
-            },
-            body: JSON.stringify({
-                query: `
-        query SearchRepositories($query: String!) {
-          search(query: $query, type: REPOSITORY, first: 10) {
-            nodes {
-              ... on Repository {
-                name
-                description
-                url
-                stargazers {
-                  totalCount
-                }
-                primaryLanguage {
-                  name
-                }
-              }
-            }
-          }
-        }
-      `,
-                variables: { query },
-            }),
-        });
-
-        const result: GraphQlResponse<SearchRepositoriesData> = await response.json();
-        const repositories = result.data.search.nodes;
-
-        return repositories ?? [];
     }
 
     async function handleSearch(searchData) {
        const searchResult = await searchRepositories(searchData.request);
 
+        localStorage.setItem('searchRequest', searchData.request);
+        localStorage.setItem('searchResult', JSON.stringify(searchResult));
+
+        dispatch(searchRepositoriesRequest(searchData.request));
         dispatch(searchRepositoriesSuccess(searchResult));
 
         return searchResult;
@@ -88,52 +70,53 @@ function App() {
                         return res.json();
                     })
                     .then((data) => {
-                        console.log(data)
                         if (data.access_token) {
                             localStorage.setItem('accessToken', data.access_token);
-                            console.log('predisp')
-                            dispatch(setAccessToken(token));
+                            dispatch(setAccessToken(data.access_token));
                             setRerender(!rerender);
                         }
                     })
             }
             getAccessToken();
         }
+
+        getUserData();
+
+        const saveRepositories = JSON.parse(localStorage.getItem('searchResult'));
+
+        if (saveRepositories) {
+            dispatch(searchRepositoriesSuccess(saveRepositories));
+
+            const previousPage = localStorage.getItem('currentPage');
+            if (previousPage) {
+                setCurrentPage(previousPage)
+            }
+        } else {
+            const userLogin = localStorage.getItem('userLogin');
+            getUserRepositories(userLogin)
+                .then(data => {
+                    dispatch(searchRepositoriesSuccess(data.data.user.repositories.nodes));
+                })
+        }
+
     }, [])
 
   return (
           <div className="app">
-              <button onClick={loginWithGithub}>
-                  LOGIN
-              </button>
-              <button onClick={getUserData}>
-                  GET USER DATA
-              </button>
-              <button onClick={() => searchRepositories('react')}>
-                  GET REPO DATA
-              </button>
-
-              <SearchForm
-              onSearch={handleSearch}
-              />
-              <RepoItemList />
-              <div>
-                  <a href="https://vitejs.dev" target="_blank">
-                      <img src="/vite.svg" className="logo" alt="Vite logo" />
-                  </a>
-                  <a href="https://reactjs.org" target="_blank">
-                      <img src={reactLogo} className="logo react" alt="React logo" />
-                  </a>
-              </div>
-              <h1>Vite + React</h1>
-              <div className="card">
-                  <p>
-                      Edit <code>src/App.tsx</code> and save to test HMR
-                  </p>
-              </div>
-              <p className="read-the-docs">
-                  Click on the Vite and React logos to learn more
-              </p>
+              <Routes>
+                  <Route path="/" element={[<button className="app__btn" onClick={loginWithGithub}>
+                      Login first
+                  </button>, <SearchForm
+                      onSearch={handleSearch}
+                  />, <RepoItemList
+                      repositories={currentRepositories}
+                  />,  <Pagination
+                      repositoriesPerPage={repositoriesPerPage}
+                      currentPage={currentPage}
+                      setPaginate={setPaginate}
+                  />]} />
+                  <Route path="/repositories/:id" element={<RepositoryDetails />} />
+              </Routes>
           </div>
   )
 }

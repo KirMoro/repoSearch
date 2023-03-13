@@ -9,6 +9,12 @@
   width: 1000px;
 }
 
+.app__btn {
+  width: 150px;
+  color: white;
+  background-color: #3456f3;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
